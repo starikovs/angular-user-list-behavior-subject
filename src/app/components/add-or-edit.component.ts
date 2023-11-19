@@ -30,14 +30,38 @@ import { User, createEmptyUser } from '../models/user.model';
         <label for="nickname" class="form-label">User nickname</label>
         <input
           formControlName="nickname"
-          [class.is-invalid]="form.invalid && !form.pristine"
+          [class.is-invalid]="
+            nickname?.invalid && nickname?.touched && !nickname?.pristine
+          "
           type="text"
           placeholder="User nickname"
           class="form-control"
           id="nickname"
         />
-        <div *ngIf="form.invalid && !form.pristine" class="invalid-feedback">
-          Should be required and something more
+        <div
+          *ngIf="nickname?.invalid && nickname?.touched && !nickname?.pristine"
+          class="invalid-feedback"
+        >
+          Required and the length should be 4-10 chars
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">User email</label>
+        <input
+          formControlName="email"
+          [class.is-invalid]="
+            email?.invalid && email?.touched && !email?.pristine
+          "
+          type="email"
+          placeholder="User email"
+          class="form-control"
+          id="email"
+        />
+        <div
+          *ngIf="email?.invalid && email?.touched && !email?.pristine"
+          class="invalid-feedback"
+        >
+          Required and should be a valid email address
         </div>
       </div>
 
@@ -63,6 +87,7 @@ import { User, createEmptyUser } from '../models/user.model';
 })
 export class AddOrEditComponent implements OnChanges {
   @Input() user: User = createEmptyUser();
+
   @Output() addOrEdit = new EventEmitter<User>();
   @Output() cancel = new EventEmitter<User>();
 
@@ -73,27 +98,41 @@ export class AddOrEditComponent implements OnChanges {
       this.user.nickname,
       Validators.compose([
         Validators.required,
-        Validators.minLength(3),
-        Validators.maxLength(5),
+        Validators.minLength(4),
+        Validators.maxLength(10),
       ]),
     ],
+    email: [
+      this.user.email,
+      Validators.compose([Validators.required, Validators.email]),
+    ],
   });
+
+  get nickname() {
+    return this.form.get('nickname');
+  }
+
+  get email() {
+    return this.form.get('email');
+  }
 
   ngOnChanges(sc: SimpleChanges) {
     const userChange: SimpleChange = sc['user'];
 
     if (userChange.previousValue && userChange.currentValue) {
-      this.resetForm(userChange.currentValue.nickname);
+      this.resetForm(
+        userChange.currentValue.nickname,
+        userChange.currentValue.email
+      );
     }
   }
 
   onSubmit() {
-    const nicknameControl = this.form.get('nickname');
-
-    if (nicknameControl) {
+    if (this.nickname && this.email) {
       this.addOrEdit.emit({
         ...this.user,
-        nickname: nicknameControl.value || '',
+        nickname: this.nickname.value || '',
+        email: this.email.value || '',
       });
 
       this.form.reset();
@@ -102,17 +141,21 @@ export class AddOrEditComponent implements OnChanges {
 
   handleResetClick() {
     if (this.user.id) {
-      const nicknameInputValue = this.form.get('nickname')?.value;
+      const nicknameInputValue = this.nickname?.value;
+      const emailInputValue = this.email?.value;
 
-      if (nicknameInputValue === this.user.nickname) {
+      if (
+        nicknameInputValue === this.user.nickname &&
+        emailInputValue === this.user.email
+      ) {
         this.cancel.emit(this.user);
       }
     }
 
-    this.resetForm(this.user.nickname);
+    this.resetForm(this.user.nickname, this.user.email);
   }
 
-  private resetForm(nickname: string) {
-    this.form.reset({ nickname });
+  private resetForm(nickname: string, email: string) {
+    this.form.reset({ nickname, email });
   }
 }

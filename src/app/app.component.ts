@@ -50,7 +50,7 @@ export class AppComponent {
 
   handleAddOrEdit(user: User) {
     if (typeof user.id !== 'undefined') {
-      this.userService.updateUser({ ...user, editingInProgress: false });
+      this.userService.updateUser(user);
     } else {
       this.userService.addUser(user);
     }
@@ -61,10 +61,10 @@ export class AppComponent {
   }
 
   handleEdit(user: User) {
-    this.userService.updateUser({ ...user, editingInProgress: true });
+    this.userService.editUser(user);
   }
 
   handleCancel(user: User) {
-    this.userService.updateUser({ ...user, editingInProgress: false });
+    this.userService.updateUser(user);
   }
 }

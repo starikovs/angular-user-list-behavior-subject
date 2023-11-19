@@ -19,6 +19,7 @@ import { User } from '../models/user.model';
       <ng-container *ngFor="let user of users; trackBy: trackByFn">
         <li *ngIf="!user.editingInProgress" class="list-group-item">
           {{ user.nickname }}
+          ( {{ user.email }} )
           <a href="#" (click)="$event.preventDefault(); edit.emit(user)"
             >edit</a
           >

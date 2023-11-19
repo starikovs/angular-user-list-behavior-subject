@@ -6,6 +6,7 @@ import { User, createEmptyUser, createUser } from '../models/user.model';
 const ACTIONS = {
   ADD: 'ADD USER',
   DELETE: 'DELETE USER',
+  EDIT: 'EDIT USER',
   UPDATE: 'UPDATE USER',
 };
 
@@ -20,7 +21,7 @@ type UserAction = {
 export class UserService {
   private userActionsSubject = new BehaviorSubject<UserAction>({
     type: ACTIONS.ADD,
-    payload: createUser('root'),
+    payload: createUser('root', 'root@gmail.com'),
   });
 
   readonly userList$ = this.userActionsSubject.pipe(
@@ -29,10 +30,19 @@ export class UserService {
         case ACTIONS.ADD:
           return [...acc, action.payload];
 
+        case ACTIONS.EDIT:
+          return acc.map((user) => {
+            if (user.id === action.payload.id) {
+              return { ...action.payload, editingInProgress: true };
+            }
+
+            return { ...user, editingInProgress: false };
+          });
+
         case ACTIONS.UPDATE:
           return acc.map((user) => {
             if (user.id === action.payload.id) {
-              return action.payload;
+              return { ...action.payload, editingInProgress: false };
             }
 
             return user;
@@ -59,13 +69,20 @@ export class UserService {
   addUser(user: User) {
     this.userActionsSubject.next({
       type: ACTIONS.ADD,
-      payload: createUser(user.nickname),
+      payload: createUser(user.nickname, user.email),
     });
   }
 
   deleteUser(user: User) {
     this.userActionsSubject.next({
       type: ACTIONS.DELETE,
+      payload: user,
+    });
+  }
+
+  editUser(user: User) {
+    this.userActionsSubject.next({
+      type: ACTIONS.EDIT,
       payload: user,
     });
   }
