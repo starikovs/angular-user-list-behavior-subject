@@ -16,25 +16,29 @@ import { User } from '../models/user.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <ul class="list-group">
-      <ng-container *ngFor="let user of users; trackBy: trackByFn">
-        <li *ngIf="!user.editingInProgress" class="list-group-item">
-          {{ user.nickname }}
-          ( {{ user.email }} )
-          <a href="#" (click)="$event.preventDefault(); edit.emit(user)"
-            >edit</a
-          >
-          |
-          <a href="#" (click)="$event.preventDefault(); delete.emit(user)"
-            >delete</a
-          >
-        </li>
-      </ng-container>
+      <li
+        *ngFor="let user of users; trackBy: trackByFn"
+        class="list-group-item"
+        [class.bg-warning]="user.editingInProgress"
+      >
+        {{ user.nickname }}
+        ( {{ user.email }} )
+        <a href="#" (click)="$event.preventDefault(); edit.emit(user)">edit</a>
+        |
+        <a href="#" (click)="$event.preventDefault(); delete.emit(user)"
+          >delete</a
+        >
+      </li>
     </ul>
   `,
   styles: [
     `
       :host {
         display: block;
+      }
+
+      .editing {
+        background: orange;
       }
     `,
   ],
