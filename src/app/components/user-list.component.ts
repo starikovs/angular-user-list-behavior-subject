@@ -4,13 +4,13 @@ import {
   EventEmitter,
   Input,
   Output,
-} from "@angular/core";
-import { CommonModule } from "@angular/common";
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
 
-import { User } from "../../models/user.model";
+import { User } from '../models/user.model';
 
 @Component({
-  selector: "app-user-list",
+  selector: 'app-user-list',
   standalone: true,
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,7 +30,13 @@ import { User } from "../../models/user.model";
       </ng-container>
     </ul>
   `,
-  styles: [``],
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
 })
 export class UserListComponent {
   @Input() users: User[] | null = [];

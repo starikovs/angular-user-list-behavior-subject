@@ -12,7 +12,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { User, createEmptyUser } from '../../models/user.model';
+import { User, createEmptyUser } from '../models/user.model';
 
 @Component({
   selector: 'app-add-or-edit',

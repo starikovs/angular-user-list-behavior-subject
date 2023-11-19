@@ -4,8 +4,8 @@ import { RouterOutlet } from '@angular/router';
 
 import { User } from './models/user.model';
 import { UserService } from './services/user.service';
-import { UserListComponent } from './components/user-list/user-list.component';
-import { AddOrEditComponent } from './components/add-or-edit/add-or-edit.component';
+import { UserListComponent } from './components/user-list.component';
+import { AddOrEditComponent } from './components/add-or-edit.component';
 
 @Component({
   selector: 'app-root',
