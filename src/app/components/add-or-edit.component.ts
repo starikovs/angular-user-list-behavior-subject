@@ -5,6 +5,7 @@ import {
   Input,
   OnChanges,
   Output,
+  Renderer2,
   SimpleChange,
   SimpleChanges,
   inject,
@@ -92,6 +93,7 @@ export class AddOrEditComponent implements OnChanges {
   @Output() cancel = new EventEmitter<User>();
 
   fb = inject(FormBuilder);
+  renderer = inject(Renderer2);
 
   form = this.fb.group({
     nickname: [
@@ -135,6 +137,7 @@ export class AddOrEditComponent implements OnChanges {
         email: this.email.value || '',
       });
 
+      this.renderer.selectRootElement('#nickname').focus();
       this.form.reset();
     }
   }
