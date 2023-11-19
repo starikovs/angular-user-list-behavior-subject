@@ -1,15 +1,14 @@
-import { Component, inject } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { RouterOutlet } from "@angular/router";
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterOutlet } from '@angular/router';
 
-import { UserListComponent } from "./components/user-list/user-list.component";
-import { AddOrEditComponent } from "./components/add-or-edit/add-or-edit.component";
-import { User } from "./models/user.model";
-import { UserEditingService } from "./services/user-editing.service";
-import { User2Service } from "./services/user2.service";
+import { User } from './models/user.model';
+import { UserService } from './services/user.service';
+import { UserListComponent } from './components/user-list/user-list.component';
+import { AddOrEditComponent } from './components/add-or-edit/add-or-edit.component';
 
 @Component({
-  selector: "app-root",
+  selector: 'app-root',
   standalone: true,
   imports: [CommonModule, RouterOutlet, UserListComponent, AddOrEditComponent],
   template: `
@@ -21,7 +20,8 @@ import { User2Service } from "./services/user2.service";
               *ngIf="userService.userList$ | async as users"
               [users]="users"
               (edit)="handleEdit($event)"
-              (delete)="handleDelete($event)"></app-user-list>
+              (delete)="handleDelete($event)"
+            ></app-user-list>
           </div>
         </div>
         <div class="col">
@@ -30,7 +30,8 @@ import { User2Service } from "./services/user2.service";
               *ngIf="userService.editingUser$ | async as editedUser"
               [user]="editedUser"
               (addOrEdit)="handleAddOrEdit($event)"
-              (cancel)="handleCancel($event)"></app-add-or-edit>
+              (cancel)="handleCancel($event)"
+            ></app-add-or-edit>
           </div>
         </div>
       </div>
@@ -45,19 +46,14 @@ import { User2Service } from "./services/user2.service";
   ],
 })
 export class AppComponent {
-  // *ngIf="userEditingService.userEditing$ | async as editedUser"
-  // userService = inject(UserService);
-  userService = inject(User2Service);
-  userEditingService = inject(UserEditingService);
+  userService = inject(UserService);
 
   handleAddOrEdit(user: User) {
-    if (typeof user.id !== "undefined") {
+    if (typeof user.id !== 'undefined') {
       this.userService.updateUser({ ...user, editingInProgress: false });
     } else {
       this.userService.addUser(user);
     }
-
-    // this.userEditingService.startEditUser(createEmptyUser());
   }
 
   handleDelete(user: User) {
@@ -66,15 +62,9 @@ export class AppComponent {
 
   handleEdit(user: User) {
     this.userService.updateUser({ ...user, editingInProgress: true });
-    // this.userEditingService.startEditUser(user);
   }
 
   handleCancel(user: User) {
     this.userService.updateUser({ ...user, editingInProgress: false });
-    // this.userEditingService.startEditUser(createEmptyUser());
-  }
-
-  log(i: any) {
-    console.log("_debug 3", i);
   }
 }

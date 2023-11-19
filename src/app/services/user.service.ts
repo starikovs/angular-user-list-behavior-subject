@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, scan } from 'rxjs';
+import { BehaviorSubject, Observable, scan, map } from 'rxjs';
 
 import { User, createEmptyUser, createUser } from '../models/user.model';
 
@@ -18,22 +18,16 @@ type UserAction = {
   providedIn: 'root',
 })
 export class UserService {
-  private userListSubject = new BehaviorSubject<User[]>([
-    createUser('root'),
-    createUser('admin'),
-  ]);
-  public readonly userList$ = this.userListSubject.asObservable();
-
-  private userListSubjectScan = new BehaviorSubject<UserAction>({
+  private userActionsSubject = new BehaviorSubject<UserAction>({
     type: ACTIONS.ADD,
     payload: createUser('root'),
   });
-  public readonly userListScan$ = this.userListSubjectScan.pipe(
+
+  readonly userList$ = this.userActionsSubject.pipe(
     scan((acc: User[], action: UserAction) => {
       switch (action.type) {
         case ACTIONS.ADD:
-          acc.push(action.payload);
-          return acc;
+          return [...acc, action.payload];
 
         case ACTIONS.UPDATE:
           return acc.map((user) => {
@@ -53,49 +47,31 @@ export class UserService {
     }, [])
   );
 
-  constructor() {}
+  readonly editingUser$: Observable<User> = this.userList$.pipe(
+    map((userList: User[]) => {
+      return (
+        userList.find((user: User) => user.editingInProgress) ||
+        createEmptyUser()
+      );
+    })
+  );
 
   addUser(user: User) {
-    this.userListSubject.next([
-      ...this.userListSubject.value,
-      createUser(user.nickname),
-    ]);
-  }
-
-  deleteUser(user: User) {
-    this.userListSubject.next(
-      this.userListSubject.value.filter((u) => u.id !== user.id)
-    );
-  }
-
-  editUser(user: User) {
-    this.userListSubject.next(
-      this.userListSubject.value.map((u) => {
-        if (user.id === u.id) {
-          return user;
-        }
-
-        return u;
-      })
-    );
-  }
-
-  addUserScan(user: User) {
-    this.userListSubjectScan.next({
+    this.userActionsSubject.next({
       type: ACTIONS.ADD,
       payload: createUser(user.nickname),
     });
   }
 
-  deleteUserScan(user: User) {
-    this.userListSubjectScan.next({
+  deleteUser(user: User) {
+    this.userActionsSubject.next({
       type: ACTIONS.DELETE,
       payload: user,
     });
   }
 
-  editUserScan(user: User) {
-    this.userListSubjectScan.next({
+  updateUser(user: User) {
+    this.userActionsSubject.next({
       type: ACTIONS.UPDATE,
       payload: user,
     });
